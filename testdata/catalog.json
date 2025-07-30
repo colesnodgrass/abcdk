@@ -1,0 +1,21 @@
+{
+  "streams": [
+    {
+      "stream": {
+        "name": "stream",
+        "supported_sync_modes" : ["full_refresh"],
+        "json_schema": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
