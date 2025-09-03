@@ -3,11 +3,11 @@ package cmds
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io"
+
 	"github.com/colesnodgrass/abcdk/config"
 	"github.com/colesnodgrass/abcdk/protocol"
-	"io"
 )
 
 type CheckCmd struct {
@@ -27,7 +27,7 @@ func (cc *CheckCmd) Run(ctx context.Context, w io.Writer) error {
 	case "fail":
 		response = cc.msg(cc.fail())
 	default:
-		return errors.New(fmt.Sprintf("unsupported config data %s", cfg.Check))
+		return fmt.Errorf("unsupported config dat for check %s", cfg.Check)
 	}
 
 	data, err := json.Marshal(response)
@@ -50,13 +50,14 @@ func (cc *CheckCmd) msg(status protocol.AirbyteConnectionStatus) protocol.Airbyt
 
 func (cc *CheckCmd) pass() protocol.AirbyteConnectionStatus {
 	return protocol.AirbyteConnectionStatus{
-		Status: protocol.AirbyteConnectionStatusStatusSUCCEEDED,
+		Message: p("check passed (expected)"),
+		Status:  protocol.AirbyteConnectionStatusStatusSUCCEEDED,
 	}
 }
 
 func (cc *CheckCmd) fail() protocol.AirbyteConnectionStatus {
 	return protocol.AirbyteConnectionStatus{
-		Message: p("data of fail provided"),
+		Message: p("check failed (expected)"),
 		Status:  protocol.AirbyteConnectionStatusStatusFAILED,
 	}
 }

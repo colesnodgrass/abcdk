@@ -1,5 +1,7 @@
 package dataset
 
+import _ "embed"
+
 var Movies = DataSet{
 	Name: "movies",
 	Catalog: Catalog{
@@ -21,24 +23,40 @@ var Movies = DataSet{
 	},
 }
 
-var Moviez = DataSet{
-	Name: "moviez",
+var MoviesMapperFilter = DataSet{
+	Name: "movies-mapper",
 	Catalog: Catalog{
 		Cursor:   []string{"film"},
-		Required: []string{"year", "film", "publisher", "director", "distributor"},
+		Required: []string{"year", "film", "publisher", "directed_by", "distributor"},
 		Properties: map[string]any{
-			"year":            map[string]any{"type": "number"},
-			"film":            map[string]any{"type": "string"},
-			"publisher":       map[string]any{"type": "string"},
-			"director":        map[string]any{"type": "string"},
-			"distributor":     map[string]any{"type": "string"},
-			"worldwide_gross": map[string]any{"type": "string"},
+			"year":             map[string]any{"type": "number"},
+			"film":             map[string]any{"type": "string"},
+			"publisher":        map[string]any{"type": "string"},
+			"directed_by":      map[string]any{"type": "string"},
+			"directed_by_hash": map[string]any{"type": "string"},
+			"distributor":      map[string]any{"type": "string"},
+			"worldwide_gross":  map[string]any{"type": "string"},
 		},
 	},
 	Records: []map[string]any{
-		{"year": 2021, "film": "Sonic the Hedgehog", "publisher": "Sega Sammy Group", "director": "Jeff Fowler", "distributor": "Paramount Pictures", "worldwide_gross": "$320,954,026"},
-		{"year": 2022, "film": "Sonic the Hedgehog two", "publisher": "Sega Sammy Group", "director": "Jeff Fowler", "distributor": "Paramount Pictures", "worldwide_gross": "$405,421,518"},
-		{"year": 2024, "film": "Sonic the Hedgehog 3", "publisher": "Sega Sammy Group", "director": "Jeff Fowler", "distributor": "Paramount Pictures", "worldwide_gross": "$491,603,985"},
+		{"year": 2020, "film": "Sonic the Hedgehog", "publisher": "Sega Sammy Group", "directed_by_hash": "260638b42c6e881e9a970bf843fce23856092d92af1133f5fdf63e72c41ac9b0", "distributor": "Paramount Pictures", "worldwide_gross": "$320,954,026"},
+	},
+}
+
+// MoviesFilmOnly is a subset of Movies which only contains the film field.
+// Exists primarily for testing column selection.
+// Source would use dataset movies with only the `film` column selected and destination would use MoviesFilmOnly
+var MoviesFilmOnly = DataSet{
+	Name: "movies-film-only",
+	Catalog: Catalog{
+		Cursor:     []string{"film"},
+		Required:   []string{"film"},
+		Properties: map[string]any{"film": map[string]any{"type": "string"}},
+	},
+	Records: []map[string]any{
+		{"film": "Sonic the Hedgehog"},
+		{"film": "Sonic the Hedgehog 2"},
+		{"film": "Sonic the Hedgehog 3"},
 	},
 }
 
@@ -94,8 +112,8 @@ var Sprinters = DataSet{
 	},
 }
 
-var Advanced = DataSet{
-	Name: "advanced...",
+var Custom = DataSet{
+	Name: "custom",
 	Catalog: Catalog{
 		Cursor:     []string{},
 		Required:   []string{},

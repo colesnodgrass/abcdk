@@ -1,6 +1,7 @@
 package dataset
 
 // ConvertIntToFloat64 recursively converts integer-like values to float64 in a map[string]any
+// This is needed for the diff comparison as numeric types can be lost when marshaling/unmarshaling external json.
 func ConvertIntToFloat64(input map[string]any) map[string]any {
 	output := make(map[string]any)
 

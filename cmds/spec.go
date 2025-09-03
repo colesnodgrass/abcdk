@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/colesnodgrass/abcdk/dataset"
 	"github.com/colesnodgrass/abcdk/protocol"
-	"io"
 )
 
 type SpecCmd struct{}
@@ -60,31 +61,31 @@ func (sc *SpecCmd) spec() *protocol.ConnectorSpecification {
 				"order":       4,
 				"type":        "string",
 				"description": "Which dataset should be used?",
-				"enum":        []string{dataset.Movies.Name, dataset.Moviez.Name, dataset.Games.Name, dataset.Sprinters.Name, dataset.Advanced.Name},
+				"enum":        []string{dataset.Movies.Name, dataset.MoviesFilmOnly.Name, dataset.MoviesMapperFilter.Name, dataset.Games.Name, dataset.Sprinters.Name, dataset.Custom.Name},
 				"default":     dataset.Movies.Name,
 			},
-			"override-cursor": map[string]any{
+			"custom_cursor": map[string]any{
 				"order":       5,
 				"type":        "string",
-				"description": "Cursor override (comma-delimited list). Only applicable if data is set to advanced...",
+				"description": fmt.Sprintf("Cursor custom (comma-delimited list). Only applicable if data is set to %s", dataset.Custom.Name),
 				"default":     `"id"`,
 			},
-			"override-required": map[string]any{
+			"custom_required": map[string]any{
 				"order":       6,
 				"type":        "string",
-				"description": "Required override (comma-delimited list). Only applicable if data is set to advanced...",
+				"description": fmt.Sprintf("Required custom (comma-delimited list). Only applicable if data is set to %s", dataset.Custom.Name),
 				"default":     `"id,name"`,
 			},
-			"override-properties": map[string]any{
+			"custom_properties": map[string]any{
 				"order":       7,
 				"type":        "string",
-				"description": "Catalog override (jsonschema). Only applicable if data is set to advanced...",
+				"description": fmt.Sprintf("Catalog custom (jsonschema). Only applicable if data is set to %s", dataset.Custom.Name),
 				"default":     `{"id":{"type":"number"},"name":{"type":"string"}}`,
 			},
-			"override-records": map[string]any{
+			"custom_records": map[string]any{
 				"order":       8,
 				"type":        "string",
-				"description": "Record override (type TDB). Only applicable if data is set to advanced...",
+				"description": fmt.Sprintf("Record custom (type TDB). Only applicable if data is set to %s", dataset.Custom.Name),
 				"default":     `[{"id":101,"name":"foo"},{"id":202,"name":"bar"}]`,
 			},
 		},

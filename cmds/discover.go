@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/colesnodgrass/abcdk/config"
 	"github.com/colesnodgrass/abcdk/protocol"
-	"io"
 )
 
 type DiscoverCmd struct {
@@ -19,7 +20,17 @@ func (dc *DiscoverCmd) Run(ctx context.Context, w io.Writer) error {
 		return fmt.Errorf("failed to load config %s: %w", dc.Config, err)
 	}
 
-	data, err := json.Marshal(dc.msg(cfg))
+	var response protocol.AirbyteMessage
+	switch cfg.Discover {
+	case "pass":
+		response = dc.msg(cfg)
+	case "fail":
+		response = dc.msgFail()
+	default:
+		return fmt.Errorf("unsupported config data for discover: %s", cfg.Discover)
+	}
+
+	data, err := json.Marshal(response)
 	if err != nil {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
@@ -38,7 +49,7 @@ func (dc *DiscoverCmd) msg(cfg config.Config) protocol.AirbyteMessage {
 			IsFileBased:             nil,
 			IsResumable:             nil,
 			JsonSchema:              cfg.Catalog(),
-			Name:                    "stream",
+			Name:                    cfg.Stream(),
 			Namespace:               nil,
 			SourceDefinedCursor:     nil,
 			SourceDefinedPrimaryKey: nil,
@@ -55,5 +66,11 @@ func (dc *DiscoverCmd) msg(cfg config.Config) protocol.AirbyteMessage {
 	return protocol.AirbyteMessage{
 		Catalog: &catalog,
 		Type:    protocol.AirbyteMessageTypeCATALOG,
+	}
+}
+
+func (dc *DiscoverCmd) msgFail() protocol.AirbyteMessage {
+	return protocol.AirbyteMessage{
+		Type: protocol.AirbyteMessageTypeCATALOG,
 	}
 }

@@ -6,6 +6,10 @@ gen:
 build:
 	CGO_ENABLED=0 go build -trimpath -ldflags="-s -w"
 
+.PHONY: test
+test:
+	go test ./...
+
 .PHONY: docker
 docker: build
 	docker buildx build --platform linux/amd64,linux/arm64 .

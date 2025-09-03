@@ -3,9 +3,10 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/colesnodgrass/abcdk/dataset"
 	"os"
 	"strings"
+
+	"github.com/colesnodgrass/abcdk/dataset"
 )
 
 type Config struct {
@@ -14,10 +15,10 @@ type Config struct {
 	Read               string `json:"read"`
 	Write              string `json:"write"`
 	Data               string `json:"data"`
-	OverrideCursor     string `json:"override-cursor"`
-	OverrideRequired   string `json:"override-required"`
-	OverrideProperties string `json:"override-properties"`
-	OverrideRecords    string `json:"override-records"`
+	CustomCursor     string `json:"custom_cursor"`
+	CustomRequired   string `json:"custom_required"`
+	CustomProperties string `json:"custom_properties"`
+	CustomRecords    string `json:"custom_records"`
 	dataSet            dataset.DataSet
 }
 
@@ -32,6 +33,10 @@ func (c *Config) Catalog() map[string]any {
 		"required":   c.dataSet.Catalog.Required,
 		"properties": c.dataSet.Catalog.Properties,
 	}
+}
+
+func (c *Config) Stream() string {
+	return "stream-" + strings.ToLower(c.Data)
 }
 
 func (c *Config) Records() dataset.Records {
@@ -52,46 +57,48 @@ func FromFile(path string) (Config, error) {
 	switch cfg.Data {
 	case dataset.Movies.Name:
 		cfg.dataSet = dataset.Movies
-	case dataset.Moviez.Name:
-		cfg.dataSet = dataset.Moviez
+	case dataset.MoviesMapperFilter.Name:
+		cfg.dataSet = dataset.MoviesMapperFilter
+	case dataset.MoviesFilmOnly.Name:
+		cfg.dataSet = dataset.MoviesFilmOnly
 	case dataset.Games.Name:
 		cfg.dataSet = dataset.Games
 	case dataset.Sprinters.Name:
 		cfg.dataSet = dataset.Sprinters
-	case dataset.Advanced.Name:
+	case dataset.Custom.Name:
 		{
 			var cursor string
-			if err := json.Unmarshal([]byte(cfg.OverrideCursor), &cursor); err != nil {
-				return Config{}, fmt.Errorf("failed to unmarshal override cursor: %w", err)
+			if err := json.Unmarshal([]byte(cfg.CustomCursor), &cursor); err != nil {
+				return Config{}, fmt.Errorf("failed to unmarshal custom cursor: %w", err)
 			}
-			dataset.Advanced.Catalog.Cursor = strings.Split(cursor, ",")
+			dataset.Custom.Catalog.Cursor = strings.Split(cursor, ",")
 		}
 
 		{
 			var required string
-			if err := json.Unmarshal([]byte(cfg.OverrideRequired), &required); err != nil {
-				return Config{}, fmt.Errorf("failed to unmarshal override required: %w", err)
+			if err := json.Unmarshal([]byte(cfg.CustomRequired), &required); err != nil {
+				return Config{}, fmt.Errorf("failed to unmarshal custom required: %w", err)
 			}
-			dataset.Advanced.Catalog.Required = strings.Split(required, ",")
+			dataset.Custom.Catalog.Required = strings.Split(required, ",")
 		}
 
 		{
 			var props map[string]any
-			if err := json.Unmarshal([]byte(cfg.OverrideProperties), &props); err != nil {
-				return Config{}, fmt.Errorf("failed to unmarshal override properties: %w", err)
+			if err := json.Unmarshal([]byte(cfg.CustomProperties), &props); err != nil {
+				return Config{}, fmt.Errorf("failed to unmarshal custom properties: %w", err)
 			}
-			dataset.Advanced.Catalog.Properties = props
+			dataset.Custom.Catalog.Properties = props
 		}
 
 		{
 			var records dataset.Records
-			if err := json.Unmarshal([]byte(cfg.OverrideRecords), &records); err != nil {
-				return Config{}, fmt.Errorf("failed to unmarshal override records: %w", err)
+			if err := json.Unmarshal([]byte(cfg.CustomRecords), &records); err != nil {
+				return Config{}, fmt.Errorf("failed to unmarshal custom records: %w", err)
 			}
-			dataset.Advanced.Records = records
+			dataset.Custom.Records = records
 		}
 
-		cfg.dataSet = dataset.Advanced
+		cfg.dataSet = dataset.Custom
 	default:
 		return Config{}, fmt.Errorf("unknown data type %s", cfg.Data)
 	}

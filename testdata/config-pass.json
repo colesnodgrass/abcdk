@@ -1,8 +1,8 @@
 {
   "check":"pass",
-  "data":"advanced...",
-  "override-cursor":"\"id\"",
-  "override-required":"\"id,name\"",
-  "override-properties":"{\"id\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"}}",
-  "override-records":"[{\"id\":101,\"name\":\"foo\"},{\"id\":202,\"name\":\"bar\"}]"
+  "data":"custom",
+  "custom_cursor":"\"id\"",
+  "custom_required":"\"id,name\"",
+  "custom_properties":"{\"id\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"}}",
+  "custom_records":"[{\"id\":101,\"name\":\"foo\"},{\"id\":202,\"name\":\"bar\"}]"
 }

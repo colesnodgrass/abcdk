@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/colesnodgrass/abcdk/catalog"
 	"github.com/colesnodgrass/abcdk/config"
 	"github.com/colesnodgrass/abcdk/protocol"
-	"io"
 )
 
 type ReadCmd struct {
@@ -29,7 +30,7 @@ func (rc *ReadCmd) Run(ctx context.Context, w io.Writer) error {
 
 	records := cfg.Records()
 	for _, record := range records {
-		data, err := json.Marshal(rc.msgRecord(rc.record(record)))
+		data, err := json.Marshal(rc.msgRecord(rc.record(cfg.Stream(), record)))
 		if err != nil {
 			return fmt.Errorf("failed to marshal record: %w", err)
 		}
@@ -63,11 +64,11 @@ func (rc *ReadCmd) msgState(msg *protocol.AirbyteStateMessage) protocol.AirbyteM
 	}
 }
 
-func (rc *ReadCmd) record(data map[string]any) *protocol.AirbyteRecordMessage {
+func (rc *ReadCmd) record(stream string, data map[string]any) *protocol.AirbyteRecordMessage {
 	return &protocol.AirbyteRecordMessage{
 		Data:      data,
 		EmittedAt: 987654321000,
-		Stream:    "stream",
+		Stream:    stream,
 	}
 }
 
