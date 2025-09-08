@@ -10,16 +10,16 @@ import (
 )
 
 type Config struct {
-	Check              string `json:"check"`
-	Discover           string `json:"discover"`
-	Read               string `json:"read"`
-	Write              string `json:"write"`
-	Data               string `json:"data"`
+	Check            string `json:"check"`
+	Discover         string `json:"discover"`
+	Read             string `json:"read"`
+	Write            string `json:"write"`
+	Data             string `json:"dataset"`
 	CustomCursor     string `json:"custom_cursor"`
 	CustomRequired   string `json:"custom_required"`
 	CustomProperties string `json:"custom_properties"`
 	CustomRecords    string `json:"custom_records"`
-	dataSet            dataset.DataSet
+	dataSet          dataset.DataSet
 }
 
 func (c *Config) Cursor() []string {
@@ -57,14 +57,8 @@ func FromFile(path string) (Config, error) {
 	switch cfg.Data {
 	case dataset.Movies.Name:
 		cfg.dataSet = dataset.Movies
-	case dataset.MoviesMapperFilter.Name:
-		cfg.dataSet = dataset.MoviesMapperFilter
-	case dataset.MoviesFilmOnly.Name:
-		cfg.dataSet = dataset.MoviesFilmOnly
 	case dataset.Games.Name:
 		cfg.dataSet = dataset.Games
-	case dataset.Sprinters.Name:
-		cfg.dataSet = dataset.Sprinters
 	case dataset.Custom.Name:
 		{
 			var cursor string

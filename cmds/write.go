@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/colesnodgrass/abcdk/airbyte"
 	"github.com/colesnodgrass/abcdk/catalog"
 	"github.com/colesnodgrass/abcdk/config"
 	"github.com/colesnodgrass/abcdk/dataset"
 	"github.com/colesnodgrass/abcdk/protocol"
 	"github.com/colesnodgrass/go-diff/diff"
-	"io"
 )
 
 type WriteCmd struct {
@@ -20,6 +22,15 @@ type WriteCmd struct {
 }
 
 func (wc *WriteCmd) Run(ctx context.Context, w io.Writer, r io.Reader) error {
+	{
+		if contents, err := os.ReadFile(wc.Config); err == nil {
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Write config (raw):\n%s\n", contents))
+		}
+		if contents, err := os.ReadFile(wc.Catalog); err == nil {
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Write catalog (raw):\n%s\n", contents))
+		}
+	}
+
 	diff.Color = false
 
 	cfg, err := config.FromFile(wc.Config)
@@ -39,6 +50,7 @@ func (wc *WriteCmd) Run(ctx context.Context, w io.Writer, r io.Reader) error {
 
 	decoder := json.NewDecoder(r)
 	for {
+		_ = airbyte.LogInfo(w, "write...")
 		var msg protocol.AirbyteMessage
 		if err := decoder.Decode(&msg); err != nil {
 			if errors.Is(err, io.EOF) {
@@ -46,6 +58,7 @@ func (wc *WriteCmd) Run(ctx context.Context, w io.Writer, r io.Reader) error {
 			}
 			_ = airbyte.LogError(w, fmt.Errorf("failed to decode record: %w", err))
 		}
+		_ = airbyte.LogInfo(w, "write 2...")
 
 		switch msg.Type {
 		case protocol.AirbyteMessageTypeRECORD:
@@ -54,7 +67,7 @@ func (wc *WriteCmd) Run(ctx context.Context, w io.Writer, r io.Reader) error {
 				expected = records[recordsPtr]
 			}
 			data, _ := json.Marshal(msg.Record.Data)
-			_ = airbyte.LogInfo(w, fmt.Sprintf("record: %s", data))
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Write record: %s", data))
 
 			if !checkRecord(w, expected, msg.Record.Data) {
 				recordsFailed++
@@ -62,7 +75,7 @@ func (wc *WriteCmd) Run(ctx context.Context, w io.Writer, r io.Reader) error {
 			recordsPtr++
 		case protocol.AirbyteMessageTypeSTATE:
 			data, _ := json.Marshal(msg.State.Data)
-			_ = airbyte.LogInfo(w, fmt.Sprintf("state: %s", data))
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Write state: %s", data))
 		}
 	}
 

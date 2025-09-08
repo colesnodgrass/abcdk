@@ -27,7 +27,7 @@ func (sc *SpecCmd) spec() *protocol.ConnectorSpecification {
 	spec := map[string]any{
 		"type":     "object",
 		"$schema":  "http://json-schema.org/draft-07/schema#",
-		"required": []string{"check", "discover", "read", "write", "data"},
+		"required": []string{"check", "discover", "read", "write", "dataset"},
 		"properties": map[string]any{
 			"check": map[string]any{
 				"order":       0,
@@ -57,11 +57,11 @@ func (sc *SpecCmd) spec() *protocol.ConnectorSpecification {
 				"enum":        []string{"pass", "fail"},
 				"default":     "pass",
 			},
-			"data": map[string]any{
+			"dataset": map[string]any{
 				"order":       4,
 				"type":        "string",
 				"description": "Which dataset should be used?",
-				"enum":        []string{dataset.Movies.Name, dataset.MoviesFilmOnly.Name, dataset.MoviesMapperFilter.Name, dataset.Games.Name, dataset.Sprinters.Name, dataset.Custom.Name},
+				"enum":        []string{dataset.Movies.Name, dataset.Games.Name, dataset.Custom.Name},
 				"default":     dataset.Movies.Name,
 			},
 			"custom_cursor": map[string]any{
@@ -97,7 +97,7 @@ func (sc *SpecCmd) spec() *protocol.ConnectorSpecification {
 		ConnectionSpecification:       spec,
 		DocumentationUrl:              p("https://github.com/colesnodgrass/abcdk"),
 		ProtocolVersion:               p("0.18.0"),
-		SupportedDestinationSyncModes: []protocol.DestinationSyncMode{protocol.DestinationSyncModeOverwrite},
+		SupportedDestinationSyncModes: []protocol.DestinationSyncMode{protocol.DestinationSyncModeOverwrite, protocol.DestinationSyncModeAppendDedup},
 		SupportsDBT:                   false,
 		SupportsIncremental:           nil,
 		SupportsNormalization:         false,

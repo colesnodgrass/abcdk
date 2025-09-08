@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 
+	"github.com/colesnodgrass/abcdk/airbyte"
 	"github.com/colesnodgrass/abcdk/catalog"
 	"github.com/colesnodgrass/abcdk/config"
 	"github.com/colesnodgrass/abcdk/protocol"
@@ -18,6 +20,18 @@ type ReadCmd struct {
 }
 
 func (rc *ReadCmd) Run(ctx context.Context, w io.Writer) error {
+	{
+		if contents, err := os.ReadFile(rc.Config); err == nil {
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Read config (raw):\n%s\n", contents))
+		}
+		if contents, err := os.ReadFile(rc.Catalog); err == nil {
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Read catalog (raw):\n%s\n", contents))
+		}
+		if contents, err := os.ReadFile(rc.Stream); err == nil {
+			_ = airbyte.LogInfo(w, fmt.Sprintf("Read stream (raw):\n%s\n", contents))
+		}
+	}
+
 	cfg, err := config.FromFile(rc.Config)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
@@ -31,6 +45,7 @@ func (rc *ReadCmd) Run(ctx context.Context, w io.Writer) error {
 	records := cfg.Records()
 	for _, record := range records {
 		data, err := json.Marshal(rc.msgRecord(rc.record(cfg.Stream(), record)))
+		_ = airbyte.LogInfo(w, fmt.Sprintf("Read record: %+v\n", record))
 		if err != nil {
 			return fmt.Errorf("failed to marshal record: %w", err)
 		}

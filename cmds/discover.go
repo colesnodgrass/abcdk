@@ -51,10 +51,9 @@ func (dc *DiscoverCmd) msg(cfg config.Config) protocol.AirbyteMessage {
 			JsonSchema:              cfg.Catalog(),
 			Name:                    cfg.Stream(),
 			Namespace:               nil,
-			SourceDefinedCursor:     nil,
-			SourceDefinedPrimaryKey: nil,
-			SupportedSyncModes:      []protocol.SyncMode{protocol.SyncModeFullRefresh},
-			AdditionalProperties:    nil,
+			SourceDefinedCursor:     p(true),
+			SourceDefinedPrimaryKey: [][]string{cfg.Cursor()},
+			SupportedSyncModes:      []protocol.SyncMode{protocol.SyncModeFullRefresh, protocol.SyncModeIncremental},
 		},
 	}
 

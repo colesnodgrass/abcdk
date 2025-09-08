@@ -1,6 +1,6 @@
 {
   "check":"pass",
-  "data":"custom",
+  "dataset":"custom",
   "custom_cursor":"\"id\"",
   "custom_required":"\"id,name\"",
   "custom_properties":"{\"id\":{\"type\":\"number\"},\"name\":{\"type\":\"string\"}}",
