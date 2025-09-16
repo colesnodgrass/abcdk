@@ -107,7 +107,7 @@ func checkRecord(w io.Writer, expected, actual map[string]any) bool {
 		return false
 	}
 	if d := diff.Diff(dataset.ConvertIntToFloat64(expected), actual); d != "" {
-		_ = airbyte.LogError(w, fmt.Errorf("unexpected record (+expected, -received):\n%s", d))
+		_ = airbyte.LogError(w, fmt.Errorf("unexpected record (-expected, +received):\n%s", d))
 		return false
 	}
 	return true
